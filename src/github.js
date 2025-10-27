@@ -1,8 +1,8 @@
 import axios from "axios";
 import { analyzeDiff } from "./ai.js";
- 
+
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
- 
+
 // helper reutilizable para peticiones a Github
 async function githubRequest(method, url, data = {}) {
   try {
@@ -18,15 +18,17 @@ async function githubRequest(method, url, data = {}) {
     });
     return res.data;
   } catch (err) {
-    console.error(`❌ Error en request a GitHub (${method.toUpperCase()} ${url}):`, err.response?.data || err.message);
+    console.error(
+      `❌ Error en request a GitHub (${method.toUpperCase()} ${url}):`,
+      err.response?.data || err.message
+    );
     throw err;
   }
 }
 
 // Función principal que maneja el Pull Request
 export async function handlePullRequest(pr) {
-
-   if (!pr) {
+  if (!pr) {
     console.error("❌ No se recibió un objeto Pull Request válido.");
     return;
   }
@@ -34,11 +36,10 @@ export async function handlePullRequest(pr) {
   const repoFull = pr.base.repo.full_name;
   const prNumber = pr.number;
   const diffUrl = pr.diff_url;
-  
+
   console.log(`🔍 Analizando PR #${prNumber} de ${repoFull}`);
 
   try {
- 
     // 1. Descargar el diff autenticado (importante para repos privados)
     const diffResp = await axios.get(diffUrl, {
       headers: {
@@ -49,28 +50,36 @@ export async function handlePullRequest(pr) {
 
     const diffText = diffResp.data;
     console.log(`📄 Diff descargado (${diffText.length} caracteres)`);
- 
+
     // 2. Analizar el diff con la IA (Ollama)
     const suggestions = await analyzeDiff(diffText);
- 
+
     if (!suggestions || suggestions.length === 0) {
-      await postIssueComment(repoFull, prNumber, "✅ El MCP no encontró problemas evidentes.");
+      await postIssueComment(
+        repoFull,
+        prNumber,
+        "✅ El MCP no encontró problemas evidentes."
+      );
       return;
     }
- 
-    // 3. Construir el cuerpo del comentario
-   let body = buildCommentBody(suggestions);
 
-   // Publicar el comentario en el PR
+    // 3. Construir el cuerpo del comentario
+    let body = buildCommentBody(suggestions);
+
+    // Publicar el comentario en el PR
     await postIssueComment(repoFull, prNumber, body);
 
     console.log("✅ Comentario publicado correctamente en el PR.");
   } catch (err) {
     console.error("❌ Error procesando Pull Request:", err.message || err);
-    await safeComment(repoFull, prNumber, "⚠️ Error interno del MCP al analizar este PR.");
+    await safeComment(
+      repoFull,
+      prNumber,
+      "⚠️ Error interno del MCP al analizar este PR."
+    );
   }
 }
- 
+
 // Construye el cuerpo Markdown del comentario
 function buildCommentBody(suggestions) {
   if (!Array.isArray(suggestions) || suggestions.length === 0) {

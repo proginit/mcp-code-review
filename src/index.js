@@ -29,9 +29,14 @@ app.post("/webhook", async (req, res) => {
 
   res.sendStatus(200);
 
-  if (event === "pull_request" && ["opened", "reopened", "synchronize"].includes(action)) {
+  if (
+    event === "pull_request" &&
+    ["opened", "reopened", "synchronize"].includes(action)
+  ) {
     console.log(`📥 Evento PR recibido: #${pr?.number} (${action})`);
-    await handlePullRequest(pr).catch(err => console.error("❌ Error en handlePullRequest:", err));
+    await handlePullRequest(pr).catch((err) =>
+      console.error("❌ Error en handlePullRequest:", err)
+    );
   } else {
     console.log(`📭 Evento ignorado: ${event} (${action})`);
   }
@@ -39,7 +44,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 // Inicia el servidor
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ MCP Server corriendo en puerto ${PORT}`);
 });
