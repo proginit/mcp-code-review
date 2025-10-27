@@ -34,6 +34,7 @@ export async function handlePullRequest(pr) {
   const repoFull = pr.base.repo.full_name;
   const prNumber = pr.number;
   const diffUrl = pr.diff_url;
+  
   console.log(`🔍 Analizando PR #${prNumber} de ${repoFull}`);
 
   try {
