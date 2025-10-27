@@ -69,9 +69,9 @@ ${diffText}
   }
 }
 
-/**
- * Intenta parsear el texto recibido como JSON válido de sugerencias.
- */
+
+ // Intenta parsear el texto recibido como JSON válido de sugerencias.
+
 function tryParseSuggestions(text) {
   try {
     // Buscar el bloque JSON más probable
