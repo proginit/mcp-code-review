@@ -63,8 +63,6 @@ export async function handlePullRequest(pr) {
 
 async function postIssueComment(repoFull, prNumber, body) {
   const url = `https://api.github.com/repos/${repoFull}/issues/${prNumber}/comments`;
-
-  // ✅ GitHub Personal Access Token usa "token", no "Bearer"
   await axios.post(
     url,
     { body },
